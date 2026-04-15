@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -29,10 +30,12 @@ void *areno_alloc(Areno* areno, size_t size_in_byte)
 		areno->start = ARENO_MALLOC(ARENO_CAPACITY);
 		assert(areno->start != NULL);
 	}
+	
+	uint64_t alignment = ((areno->count + 15) & ~15) - areno->count;
 
-	if (areno->count + size_in_byte >= ARENO_CAPACITY) { // not enough place in this areno
+	if (areno->count + alignment + size_in_byte >= ARENO_CAPACITY) { // not enough place in this areno
 		if (areno->next == NULL) {
-			areno->next = ARENO_MALLOC(sizeof(Areno));
+			areno->next = (Areno *)ARENO_MALLOC(sizeof(Areno));
 			assert(areno->next != NULL);
 
 			*areno->next = (Areno) {0};
@@ -40,22 +43,31 @@ void *areno_alloc(Areno* areno, size_t size_in_byte)
 		return areno_alloc(areno->next, size_in_byte);
 	}
 
+	areno->count += alignment;
+	void *alloc = (char*)areno->start + areno->count;
 	areno->count += size_in_byte;
-	return areno->start + areno->count;
+
+	return alloc;
 }
 
-void *areno_free(Areno* areno)
+void areno_free(Areno* areno)
 {
-	Areno *current = areno;
-	ARENO_FREE(areno->start);
-	while (current->next != NULL) {
-		Areno *next = current->next;
-
-		if (current != areno) {
-			ARENO_FREE(current->start);
-			ARENO_FREE(current);
-		}
-
-		current = next;
+	if (areno->start != NULL) {
+		ARENO_FREE(areno->start);
+		areno->start = NULL;
 	}
+
+	Areno *current = areno->next;
+	while (current != NULL) {
+		Areno *to_free = current;
+		current = current->next;
+
+		if (to_free->start != NULL) {
+			ARENO_FREE(to_free->start);
+		}
+		ARENO_FREE(to_free);
+	}
+
+	areno->next  = NULL;
+	areno->count = 0;
 }
