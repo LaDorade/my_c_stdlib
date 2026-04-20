@@ -1,12 +1,16 @@
 #ifndef __ARENO_H_
 #define __ARENO_H_
 
-#include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifndef  ARENO_ASSERT
+#include <assert.h>
+#define  ARENO_ASSERT assert
+#endif //ARENO_ASSERT
 
 #ifndef  ARENO_MALLOC
 #define  ARENO_MALLOC malloc
@@ -32,11 +36,11 @@ typedef struct Areno {
 
 void *areno_alloc(Areno* areno, size_t size_in_byte)
 {
-	assert(size_in_byte < ARENO_CAPACITY && "Requested to much memory");
+	ARENO_ASSERT(size_in_byte < ARENO_CAPACITY && "Requested more than one Areno capcity");
 
 	if (areno->start == NULL) { // initial alloc
 		areno->start = ARENO_MALLOC(ARENO_CAPACITY);
-		assert(areno->start != NULL);
+		ARENO_ASSERT(areno->start != NULL);
 	}
 	
 	uint64_t alignment = ((areno->count + 15) & ~15) - areno->count;
@@ -44,7 +48,7 @@ void *areno_alloc(Areno* areno, size_t size_in_byte)
 	if (areno->count + alignment + size_in_byte >= ARENO_CAPACITY) { // not enough place in this areno
 		if (areno->next == NULL) {
 			areno->next = (Areno *)ARENO_MALLOC(sizeof(Areno));
-			assert(areno->next != NULL);
+			ARENO_ASSERT(areno->next != NULL);
 
 			*areno->next = (Areno) {0};
 		}
