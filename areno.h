@@ -1,3 +1,12 @@
+/**
+ *
+ * Maty Ju, github.com/LaDorade
+ * github.com/LaDorade/my_c_stdlib
+ *
+ * file raw: https://raw.githubusercontent.com/LaDorade/my_c_stdlib/refs/heads/main/areno.h
+ * 
+ */
+
 #ifndef __ARENO_H_
 #define __ARENO_H_
 
