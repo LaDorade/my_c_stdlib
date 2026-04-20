@@ -1,11 +1,7 @@
 #ifndef __ARENO_H_
 #define __ARENO_H_
 
-#include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #ifndef  ARENO_ASSERT
 #include <assert.h>
@@ -43,7 +39,7 @@ void *areno_alloc(Areno* areno, size_t size_in_byte)
 		ARENO_ASSERT(areno->start != NULL);
 	}
 	
-	uint64_t alignment = ((areno->count + 15) & ~15) - areno->count;
+	size_t alignment = ((areno->count + 15) & ~15) - areno->count;
 
 	if (areno->count + alignment + size_in_byte >= ARENO_CAPACITY) { // not enough place in this areno
 		if (areno->next == NULL) {
