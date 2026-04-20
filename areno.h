@@ -1,3 +1,6 @@
+#ifndef __ARENO_H_
+#define __ARENO_H_
+
 #include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -13,14 +16,19 @@
 #define  ARENO_FREE free
 #endif //ARENO_FREE
 
-#define ARENO_CAPACITY 1024*1024 // 1M
+#ifndef  ARENO_CAPACITY
+#define  ARENO_CAPACITY 1024*1024 // 1M
+#endif //ARENO_CAPACITY
 
-typedef struct Areno Areno;
 typedef struct Areno {
 	void*  start;
 	Areno* next;
 	size_t count;
 } Areno;
+
+#endif // __ARENO_H_
+
+#ifdef ARENO_IMPLEMENTATION
 
 void *areno_alloc(Areno* areno, size_t size_in_byte)
 {
@@ -71,3 +79,5 @@ void areno_free(Areno* areno)
 	areno->next  = NULL;
 	areno->count = 0;
 }
+
+#endif // ARENO_IMPLEMENTATION
