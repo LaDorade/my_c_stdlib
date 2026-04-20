@@ -80,4 +80,13 @@ void areno_free(Areno* areno)
 	areno->count = 0;
 }
 
+void areno_reset(Areno* areno)
+{
+	areno->count = 0;
+	for (Areno* ar = ar->next; ar != NULL; ar = ar->next)
+	{
+		ar->count = 0;
+	}
+}
+
 #endif // ARENO_IMPLEMENTATION
