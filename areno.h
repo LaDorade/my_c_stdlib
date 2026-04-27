@@ -29,11 +29,16 @@
 #define  ARENO_CAPACITY 1024*1024 // 1M
 #endif //ARENO_CAPACITY
 
+typedef struct Areno Areno;
 typedef struct Areno {
 	void*  start;
 	Areno* next;
 	size_t count;
 } Areno;
+
+void *areno_alloc(Areno* areno, size_t size_in_byte);
+void  areno_reset(Areno* areno);
+void  areno_free (Areno* areno);
 
 #endif // __ARENO_H_
 
